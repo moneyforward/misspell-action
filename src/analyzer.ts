@@ -1,3 +1,4 @@
+import path from 'path';
 import stream from 'stream';
 import util from 'util';
 import { StaticCodeAnalyzer, Transformers, findByGlob, tool } from '@moneyforward/sca-action-core';
@@ -12,7 +13,16 @@ export default class Analyzer extends StaticCodeAnalyzer {
   }
 
   async prepare(): Promise<unknown> {
-    return tool.execute('go', ['get', '-u', 'github.com/client9/misspell/cmd/misspell']);
+    console.log('::group::Installing packages...');
+    try {
+      await tool.execute('go', ['get', '-v', '-u', 'github.com/client9/misspell/cmd/misspell']);
+      const gopath = await tool.substitute('go', ['env', 'GOPATH']);
+      process.env['PATH'] = [path.join(gopath, 'bin'), process.env.PATH].join(path.delimiter);
+      debug('%s', process.env.PATH);
+      return Promise.resolve();
+    } finally {
+      console.log('::endgroup::');
+    }
   }
 
   createTransformStreams(): Transformers {
