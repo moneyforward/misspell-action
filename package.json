@@ -1,6 +1,6 @@
 {
   "name": "misspell-action",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Analyze code statically using misspell in Github actions",
   "main": "dist/index.js",
   "scripts": {
