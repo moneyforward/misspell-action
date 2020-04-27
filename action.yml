@@ -1,0 +1,28 @@
+---
+name: Code review using misspell
+author: Money Forward, Inc.
+description: Analyze code statically using misspell in Github actions
+inputs:
+  files:
+    description: |
+      Specify patterns by [`@actions/glob`](https://github.com/actions/toolkit/tree/master/packages/glob)
+      
+      (Multiple patterns can be specified by separating them with line feed)
+    required: false
+  locale:
+    description: |
+      Correct spellings using locale perferances for US or UK.  Default is to use a neutral variety of English.
+      Setting locale to US will correct the British spelling of 'colour' to 'color'
+    required: false
+  ignore:
+    description: ignore the following corrections, comma separated
+    required: false
+  working_directory:
+    description: Changes the current working directory of the Node.js process
+    required: false
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'search'
+  color: 'orange'
