@@ -1,7 +1,8 @@
 import Analyzer from './analyzer';
 
+console.log('::echo::%s', process.env['RUNNER_DEBUG'] === '1' ? 'on' : 'off');
 (async (): Promise<void> => {
-  const files = (process.env.INPUT_FILES || '.');
+  const files = process.env.INPUT_FILES || '.';
   const locale = process.env.INPUT_LOCALE || 'US';
   if (!(locale === undefined || (locale === 'UK' || locale === 'US')))
     throw new TypeError('Please specify either US or UK for the locale.');
