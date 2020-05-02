@@ -12,7 +12,7 @@ export default class Analyzer extends StaticCodeAnalyzer {
     super('misspell', ['-i', ignore, '-locale', locale, '-j', '1'], undefined, undefined, findByGlob);
   }
 
-  async prepare(): Promise<unknown> {
+  protected async prepare(): Promise<unknown> {
     console.log('::group::Installing packages...');
     try {
       await tool.execute('go', ['get', '-v', '-u', 'github.com/client9/misspell/cmd/misspell']);
@@ -25,7 +25,7 @@ export default class Analyzer extends StaticCodeAnalyzer {
     }
   }
 
-  createTransformStreams(): Transformers {
+  protected createTransformStreams(): Transformers {
     const transformers = [
       new tool.LineTransformStream(),
       new stream.Transform({
