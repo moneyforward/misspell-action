@@ -1,7 +1,9 @@
 import path from 'path';
 import stream from 'stream';
 import util from 'util';
-import { StaticCodeAnalyzer, Transformers, findByGlob, tool } from '@moneyforward/sca-action-core';
+import Command from '@moneyforward/command';
+import StaticCodeAnalyzer, { finder } from '@moneyforward/sca-action-core';
+import { transform } from '@moneyforward/stream-util';
 
 const debug = util.debuglog('misspell-action');
 
@@ -9,25 +11,26 @@ export type Locale = 'US' | 'UK';
 
 export default class Analyzer extends StaticCodeAnalyzer {
   constructor(locale: Locale = 'US', ignore = '') {
-    super('misspell', ['-i', ignore, '-locale', locale, '-j', '1'], undefined, undefined, findByGlob);
+    super('misspell', ['-i', ignore, '-locale', locale], undefined, undefined, finder.GlobFinder);
   }
 
-  protected async prepare(): Promise<unknown> {
+  protected async prepare(): Promise<void> {
     console.log('::group::Installing packages...');
     try {
-      await tool.execute('go', ['get', '-v', '-u', 'github.com/client9/misspell/cmd/misspell']);
-      const gopath = await tool.substitute('go', ['env', 'GOPATH']);
+      const [gopath] = await Promise.all([
+        Command.substitute('go', ['env', 'GOPATH']),
+        Command.execute('go', ['get', '-v', '-u', 'github.com/client9/misspell/cmd/misspell'])
+      ]);
       process.env['PATH'] = [path.join(gopath, 'bin'), process.env.PATH].join(path.delimiter);
       debug('%s', process.env.PATH);
-      return Promise.resolve();
     } finally {
       console.log('::endgroup::');
     }
   }
 
-  protected createTransformStreams(): Transformers {
-    const transformers = [
-      new tool.LineTransformStream(),
+  protected createTransformStreams(): stream.Transform[] {
+    return [
+      new transform.Lines(),
       new stream.Transform({
         readableObjectMode: true,
         writableObjectMode: true,
@@ -46,7 +49,5 @@ export default class Analyzer extends StaticCodeAnalyzer {
         }
       })
     ];
-    transformers.reduce((prev, next) => prev.pipe(next));
-    return [transformers[0], transformers[transformers.length - 1]];
   }
 }
