@@ -27,7 +27,7 @@
   "homepage": "https://github.com/moneyforward/misspell-action#readme",
   "dependencies": {
     "@moneyforward/command": "0.0.6",
-    "@moneyforward/sca-action-core": "^0.1.2",
+    "@moneyforward/sca-action-core": "^0.1.9",
     "@moneyforward/stream-util": "0.0.2"
   },
   "devDependencies": {
