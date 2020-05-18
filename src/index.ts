@@ -5,7 +5,7 @@ import Command from '@moneyforward/command';
 import StaticCodeAnalyzer, { AnalyzerConstructorParameter, finder } from '@moneyforward/sca-action-core';
 import { transform } from '@moneyforward/stream-util';
 
-const debug = util.debuglog('@moneyforward/misspell-action');
+const debug = util.debuglog('@moneyforward/code-review-action-misspell-plugin');
 
 export type Locale = 'US' | 'UK';
 
