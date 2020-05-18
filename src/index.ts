@@ -14,8 +14,8 @@ export function isLocale(locale: string | undefined): locale is Locale {
 }
 
 export default class Analyzer extends StaticCodeAnalyzer {
-  constructor(...[locale, ignore]: AnalyzerConstructorParameter[]) {
-    super('misspell', ['-i', ignore || '', '-locale', locale || 'US'], undefined, undefined, finder.GlobFinder);
+  constructor(...args: AnalyzerConstructorParameter[]) {
+    super('misspell', args.map(String), undefined, undefined, finder.GlobFinder);
   }
 
   protected async prepare(): Promise<void> {
