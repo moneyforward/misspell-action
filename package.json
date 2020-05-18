@@ -1,6 +1,6 @@
 {
   "name": "@moneyforward/code-review-action-misspell-plugin",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Analyze code statically using misspell in Github actions",
   "main": "dist/main/index.js",
   "scripts": {
