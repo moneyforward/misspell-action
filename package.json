@@ -8,7 +8,7 @@
     "prepare": "gulp clean build",
     "version": "gulp clean build && git add dist/action",
     "postversion": "gulp postversion",
-    "start": "gulp build && node dist/main/index.js"
+    "start": "node dist/action/index.js"
   },
   "publishConfig": {
     "access": "public"
