@@ -14,6 +14,7 @@ inputs:
       Correct spellings using locale perferances for US or UK.  Default is to use a neutral variety of English.
       Setting locale to US will correct the British spelling of 'colour' to 'color'
     required: false
+    default: US
   ignore:
     description: ignore the following corrections, comma separated
     required: false
