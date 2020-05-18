@@ -1,18 +1,57 @@
-import Analyzer from './analyzer';
+import path from 'path';
+import stream from 'stream';
+import util from 'util';
+import Command from '@moneyforward/command';
+import StaticCodeAnalyzer, { AnalyzerConstructorParameter, finder } from '@moneyforward/sca-action-core';
+import { transform } from '@moneyforward/stream-util';
 
-console.log('::echo::%s', process.env['RUNNER_DEBUG'] === '1' ? 'on' : 'off');
-(async (): Promise<void> => {
-  const files = process.env.INPUT_FILES || '.';
-  const locale = process.env.INPUT_LOCALE || 'US';
-  if (!(locale === undefined || (locale === 'UK' || locale === 'US')))
-    throw new TypeError('Please specify either US or UK for the locale.');
-  const ignore = process.env.INPUT_IGNORE;
-  const workingDirectory = process.env.INPUT_WORKING_DIRECTORY;
-  workingDirectory && process.chdir(workingDirectory);
-  const analyzer = new Analyzer(locale, ignore);
-  analyzer.reporterTypeNotation = process.env.INPUT_REPORTER_TYPE_NOTATION;
-  process.exitCode = await analyzer.analyze(files);
-})().catch(reason => {
-  console.log(`::error::${String(reason)}`);
-  process.exit(1);
-});
+const debug = util.debuglog('@moneyforward/misspell-action');
+
+export type Locale = 'US' | 'UK';
+
+export function isLocale(locale: string | undefined): locale is Locale {
+  return locale === 'UK' || locale === 'US';
+}
+
+export default class Analyzer extends StaticCodeAnalyzer {
+  constructor(...[locale, ignore]: AnalyzerConstructorParameter[]) {
+    super('misspell', ['-i', ignore || '', '-locale', locale || 'US'], undefined, undefined, finder.GlobFinder);
+  }
+
+  protected async prepare(): Promise<void> {
+    console.log('::group::Installing packages...');
+    try {
+      const [gopath] = await Promise.all([
+        Command.substitute('go', ['env', 'GOPATH']),
+        Command.execute('go', ['get', '-v', '-u', 'github.com/client9/misspell/cmd/misspell'])
+      ]);
+      process.env['PATH'] = [path.join(gopath, 'bin'), process.env.PATH].join(path.delimiter);
+      debug('%s', process.env.PATH);
+    } finally {
+      console.log('::endgroup::');
+    }
+  }
+
+  protected createTransformStreams(): stream.Transform[] {
+    return [
+      new transform.Lines(),
+      new stream.Transform({
+        readableObjectMode: true,
+        writableObjectMode: true,
+        transform: function (warning: string, _encoding, done): void {
+          debug('%s', warning);
+          const regex = /^(.+):(\d+):(\d+): (".+" is a misspelling of ".+")$/;
+          const [matches, file, line, column, message] = regex.exec(warning) || [];
+          done(null, matches && {
+            file,
+            line,
+            column,
+            message,
+            severity: 'warning',
+            code: 'misspelling'
+          });
+        }
+      })
+    ];
+  }
+}

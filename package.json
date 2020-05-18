@@ -1,13 +1,17 @@
 {
-  "name": "misspell-action",
+  "name": "@moneyforward/code-review-action-misspell-plugin",
   "version": "0.0.8",
   "description": "Analyze code statically using misspell in Github actions",
-  "main": "dist/index.js",
+  "main": "dist/main/index.js",
   "scripts": {
     "test": "gulp test",
-    "version": "gulp clean build && git add dist",
+    "prepare": "gulp clean build",
+    "version": "gulp clean build && git add dist/action",
     "postversion": "gulp postversion",
-    "start": "gulp build && node dist/index.js"
+    "start": "gulp build && node dist/main/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "repository": {
     "type": "git",
@@ -18,7 +22,6 @@
     "actions",
     "misspell"
   ],
-  "private": true,
   "author": "Money Forward, Inc.",
   "license": "MIT",
   "bugs": {
@@ -26,8 +29,9 @@
   },
   "homepage": "https://github.com/moneyforward/misspell-action#readme",
   "dependencies": {
+    "@moneyforward/code-review-action": "0.0.2",
     "@moneyforward/command": "0.0.6",
-    "@moneyforward/sca-action-core": "^0.1.9",
+    "@moneyforward/sca-action-core": "^0.1.10",
     "@moneyforward/stream-util": "0.0.2"
   },
   "devDependencies": {
