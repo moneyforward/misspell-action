@@ -2,8 +2,11 @@ import path from 'path';
 import stream from 'stream';
 import util from 'util';
 import Command from '@moneyforward/command';
-import StaticCodeAnalyzer, { AnalyzerConstructorParameter, finder } from '@moneyforward/sca-action-core';
+import StaticCodeAnalyzer, { finder } from '@moneyforward/sca-action-core';
 import { transform } from '@moneyforward/stream-util';
+import { analyzer } from '@moneyforward/code-review-action/';
+
+type AnalyzerConstructorParameter = analyzer.AnalyzerConstructorParameter;
 
 const debug = util.debuglog('@moneyforward/code-review-action-misspell-plugin');
 
@@ -13,7 +16,7 @@ export function isLocale(locale: string | undefined): locale is Locale {
   return locale === 'UK' || locale === 'US';
 }
 
-export default class Analyzer extends StaticCodeAnalyzer {
+export default abstract class Analyzer extends StaticCodeAnalyzer {
   constructor(...args: AnalyzerConstructorParameter[]) {
     super('misspell', args.map(String), undefined, undefined, finder.GlobFinder);
   }

@@ -1,4 +1,4 @@
-import CodeReviewAction from '@moneyforward/code-review-action';
+import CodeReviewAction, { analyzer } from '@moneyforward/code-review-action';
 import Analyzer from '.';
 
 (async (): Promise<void> => {
@@ -8,7 +8,8 @@ import Analyzer from '.';
     const ignoreOption = process.env.INPUT_IGNORE ? ['-i', process.env.INPUT_IGNORE] : [];
     const options = localeOption.concat(ignoreOption);
     process.env['INPUT_OPTIONS'] = JSON.stringify(options);
-    process.exitCode = await new CodeReviewAction(Analyzer).execute();
+    const action = new CodeReviewAction(Analyzer as unknown as analyzer.AnalyzerConstructor);
+    process.exitCode = await action.execute();
   } catch (reason) {
     console.log('::error::%s', reason);
     process.exitCode = 1;

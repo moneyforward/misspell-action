@@ -1,12 +1,16 @@
 import { expect } from 'chai';
 import stream from 'stream';
 import util from 'util';
+import { reporter } from  "@moneyforward/code-review-action"
 import Analyzer from '../src'
 
 describe('Transform', () => {
   it('should return the problem object', async () => {
     const text = 'README.md:122:0: "zeebra" is a misspelling of "zebra"';
     const analyzer =  new (class extends Analyzer {
+      get Reporter(): reporter.ReporterConstructor {
+        throw new Error("Method not implemented.");
+      }
       public constructor() {
         super();
       }
